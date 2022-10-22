@@ -115,7 +115,7 @@ router.post('/verify', async (req: Request, res: Response) => {
 
 // GET /users/@{username}
 // Get a user by their username
-router.get('/@:username', async (req: Request, res: Response) => {
+router.get('/:username', async (req: Request, res: Response) => {
   // Get user from database
   const user = await userRepository.findOneBy({
     username: req.params.username

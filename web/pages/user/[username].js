@@ -17,7 +17,7 @@ const UserPage = () => {
     }
 
     axios
-      .get(`/api/users/@${router.query.username}`)
+      .get(`/api/users/${router.query.username}`)
       .then(res => {
         setUser(res.data.user);
       })

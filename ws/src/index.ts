@@ -1,7 +1,13 @@
+import * as dotenv from 'dotenv';
+dotenv.config({
+  path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env'
+});
 import express, { Request, Response } from 'express';
 import ws from './routes/ws.js';
-const app = express();
 
+console.log(`NODE_ENV=${process.env.NODE_ENV}`);
+
+const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(express.json({}));

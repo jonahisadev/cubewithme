@@ -21,16 +21,22 @@ router.post('/', userIsAuth, async (req: Request, res: Response) => {
 
   try {
     // Spin up a websocket server
-    const { data } = await axios.post(`${process.env.WS_API_URL}/ws`, {
-      title
-    });
+    const { data } = await axios.post(
+      `${process.env.WS_API_URL}/ws`,
+      {
+        title
+      },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
 
     // Process some info
     const short_id = generateRoomId();
-    const { hostname } = new URL(process.env.WS_API_URL);
+    const host =
+      process.env.NODE_ENV === 'production'
+        ? new URL(process.env.WS_API_URL).hostname
+        : 'localhost';
     const protocol = process.env.NODE_ENV === 'production' ? 'wss' : 'ws';
-    // const url = `${protocol}://${hostname}:${data.port}`;
-    const url = `${protocol}://localhost:${data.port}`;
+    const url = `${protocol}://${host}:${data.port}`;
 
     // Save information in the DB
     const createdRoom = roomRepository.create({

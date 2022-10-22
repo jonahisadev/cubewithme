@@ -1,0 +1,17 @@
+version: 2.1
+
+setup: true
+
+orbs:
+  path-filtering: circleci/path-filtering@0.1.3
+
+workflows:
+  setup:
+    jobs:
+      - path-filtering/filter:
+          base-revision: main
+          config-path: .circleci/deploy.yml
+          mapping: |
+            web/.* deploy-web true
+            api/.* deploy-api true
+            ws/.* deploy-ws true

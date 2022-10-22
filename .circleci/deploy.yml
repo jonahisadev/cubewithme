@@ -1,0 +1,82 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.0.3
+
+parameters:
+  deploy-web:
+    type: boolean
+    default: false
+  deploy-api:
+    type: boolean
+    default: false
+  deploy-ws:
+    type: boolean
+    default: true
+
+jobs:
+  deploy-web:
+    docker:
+      - image: cimg/base:2022.10-20.04
+    steps:
+      - checkout
+      - node/install:
+          install-yarn: true
+      - run: |
+          cd web
+          yarn global add vercel
+          export PATH="$(yarn global bin):$PATH"
+          yarn install --frozen-lockfile
+          vercel deploy --prod --token=$VERCEL_TOKEN
+  deploy-api:
+    docker:
+      - image: cimg/base:2022.10-20.04
+    steps:
+      - checkout
+      - attach_workspace:
+          at: api
+      - add_ssh_keys
+      - run:
+          name: 'Deploy files'
+          command: |
+            sudo apt-get update && sudo apt-get install rsync
+            mkdir -p ~/.ssh
+            ssh-keyscan $API_HOST >> ~/.ssh/known_hosts
+            rsync -va --delete --exclude "node_modules/**" --exclude .env.prod --exclude "keys/**" ./api $API_USER@$API_HOST:/home/$API_USER/app
+      - run:
+          name: 'Restart service'
+          command: |
+            ssh $API_USER@$API_HOST "bash -ic ./runner.sh"
+  deploy-ws:
+    docker:
+      - image: cimg/base:2022.10-20.04
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ws
+      - add_ssh_keys
+      - run:
+          name: 'Deploy files'
+          command: |
+            sudo apt-get update && sudo apt-get install rsync
+            mkdir -p ~/.ssh
+            ssh-keyscan $WS_HOST >> ~/.ssh/known_hosts
+            rsync -va --delete --exclude "node_modules/**" --exclude .env.prod ./ws $WS_USER@$WS_HOST:/home/$WS_USER/app
+      - run:
+          name: 'Restart service'
+          command: |
+            ssh $WS_USER@$WS_HOST "bash -ic ./runner.sh"
+
+workflows:
+  run-deploy-web:
+    when: << pipeline.parameters.deploy-web >>
+    jobs:
+      - deploy-web
+  run-deploy-api:
+    when: << pipeline.parameters.deploy-api >>
+    jobs:
+      - deploy-api
+  run-deploy-ws:
+    when: << pipeline.parameters.deploy-ws >>
+    jobs:
+      - deploy-ws

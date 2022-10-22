@@ -31,6 +31,7 @@ services:
     command:
       "yarn dev"
     environment:
+      CORS_ORIGIN: 'http://127.0.0.1'
       WS_API_URL: "http://ws:4000"
       APP_URL: "http://localhost:3000"
       DB_HOST: "database"

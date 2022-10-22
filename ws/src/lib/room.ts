@@ -1,19 +1,22 @@
-import { WebSocketServer, WebSocket } from 'ws';
-import { createServer } from 'http';
+import { readFileSync } from 'fs';
+import { createServer as createHttpServer, Server as HttpServer } from 'http';
+import {
+  createServer as createHttpsServer,
+  Server as HttpsServer
+} from 'https';
 import { AddressInfo } from 'net';
 import { v4 as uuid } from 'uuid';
-import { OutMessage, InMessage, Time } from './types.js';
+import { WebSocket, WebSocketServer } from 'ws';
+
+import database from './database.js';
+import { exclude, findPlayerById, removeRoom, removeUser } from './index.js';
 import { Player, Spectator } from './player.js';
 import ports from './ports.js';
-import { exclude, findPlayerById, removeUser, removeRoom } from './index.js';
-import database from './database.js';
 import { scramble, ScrambleEvent } from './scramble.js';
+import { InMessage, OutMessage, Time } from './types.js';
 
 interface TimeBuffer {
-  players: {
-    id: string;
-    time: Time;
-  }[];
+  players: { id: string; time: Time }[];
   remaining: string[];
 }
 
@@ -56,12 +59,7 @@ class Room {
       case 'handshake': {
         // Enforce size limit
         if (this.clients.size === 10) {
-          ws.send(
-            JSON.stringify({
-              type: 'handshake',
-              ok: false
-            })
-          );
+          ws.send(JSON.stringify({ type: 'handshake', ok: false }));
           ws.close(1008, 'Room is full');
         }
 
@@ -85,22 +83,14 @@ class Room {
           });
 
           // Send spectator count
-          this.broadcast({
-            type: 'spectate',
-            count: this.spectators.length
-          });
+          this.broadcast({ type: 'spectate', count: this.spectators.length });
           return;
         }
 
         // Find player in global store
         const player = await findPlayerById(payload.id);
         if (!player) {
-          ws.send(
-            JSON.stringify({
-              type: 'handshake',
-              ok: false
-            })
-          );
+          ws.send(JSON.stringify({ type: 'handshake', ok: false }));
           ws.close(1008, 'Did not register');
           break;
         }
@@ -231,11 +221,7 @@ class Room {
         // Save time to buffer
         this.timeBuffer.players.push({
           id: payload.id,
-          time: {
-            time: payload.time,
-            dnf: payload.dnf,
-            won: false
-          }
+          time: { time: payload.time, dnf: payload.dnf, won: false }
         });
 
         // Remove player from remaining list
@@ -309,13 +295,7 @@ class Room {
         await this.generateScramble();
 
         // Let everyone else know
-        this.broadcast(
-          {
-            type: 'event',
-            event: this.event
-          },
-          [player.id]
-        );
+        this.broadcast({ type: 'event', event: this.event }, [player.id]);
         break;
       }
 
@@ -328,10 +308,7 @@ class Room {
 
   private async generateScramble() {
     this.scramble = await scramble(this.event);
-    this.broadcast({
-      type: 'scramble',
-      scramble: this.scramble
-    });
+    this.broadcast({ type: 'scramble', scramble: this.scramble });
   }
 
   private updatePlayerCount() {
@@ -347,10 +324,7 @@ class Room {
       this.clients.delete(player.id);
 
       // Tell everyone else
-      this.broadcast({
-        type: 'playerLeave',
-        username: player.username
-      });
+      this.broadcast({ type: 'playerLeave', username: player.username });
 
       // Remove player from timebuffer if they were playing
       if (this.playing) {
@@ -424,14 +398,9 @@ class Room {
 
       if (canPlay === areReady.length && canPlay > 0) {
         this.playing = true;
-        this.broadcast({
-          type: 'allReady'
-        });
+        this.broadcast({ type: 'allReady' });
 
-        this.timeBuffer = {
-          players: [],
-          remaining: areReady.map(x => x.id)
-        };
+        this.timeBuffer = { players: [], remaining: areReady.map(x => x.id) };
       }
     } else {
       // Check for the end of the round
@@ -495,9 +464,18 @@ class Room {
 
   static async create(title: string): Promise<Room> {
     return new Promise((res, rej) => {
-      const server = createServer({});
-      const wss = new WebSocketServer({ server });
+      // Load certificates if in production
+      let server: HttpServer | HttpsServer;
+      if (process.env.NODE_ENV === 'production') {
+        server = createHttpsServer({
+          cert: readFileSync(`${process.env.CERT_PATH}/fullchain.pem`),
+          key: readFileSync(`${process.env.CERT_PATH}/privkey.pem`)
+        });
+      } else {
+        server = createHttpServer();
+      }
 
+      const wss = new WebSocketServer({ server });
       const room = new Room(wss, title);
 
       const listener = server.listen(ports.take(), () => {

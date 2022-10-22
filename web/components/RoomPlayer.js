@@ -69,7 +69,7 @@ const RoomPlayer = ({ me, name, times, ready, sitOut, showAdmin, onKick }) => {
   // Load in player image
   useEffect(() => {
     axios
-      .get(`/api/users/@${name}`)
+      .get(`/api/users/${name}`)
       .then(res => {
         setImage(res.data.user.pfp);
       })
