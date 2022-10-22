@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  web:
+    image: "node:16"
+    working_dir: "/app"
+    depends_on:
+      - api
+    networks:
+      - frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./web:/app
+    command:
+      "yarn dev"
+    environment:
+      API_URL: "http://api:8080"
+  api:
+    image: "node:16"
+    working_dir: "/app"
+    depends_on:
+      - database
+    networks:
+      - backend
+      - frontend
+    volumes:
+      - ./api:/app
+    ports:
+      - 8080:8080
+    command:
+      "yarn dev"
+    environment:
+      WS_API_URL: "http://ws:4000"
+      APP_URL: "http://localhost:3000"
+      DB_HOST: "database"
+      DB_PORT: 5432
+      DB_USER: "snowflake"
+      DB_PASSWORD: "password"
+  ws:
+    image: "node:16"
+    working_dir: "/app"
+    networks:
+      - frontend
+      - backend
+    ports:
+      - "4001:4000"
+      - "20000-20020:20000-20020"
+    volumes:
+      - ./ws:/app
+    command:
+      "yarn dev"
+    environment:
+      DB_HOST: "database"
+      DB_PORT: 5432
+      DB_USER: "snowflake"
+      DB_PASSWORD: "password"
+  database:
+    image: postgres
+    restart: always
+    ports:
+      - 5432
+    networks:
+      - backend
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: cubes
+      POSTGRES_USER: snowflake
+      POSTGRES_PASSWORD: password
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - backend
+    ports:
+      - 8910:8080
+  mailhog:
+    image: mailhog/mailhog
+    logging:
+      driver: 'none'
+    networks:
+      - backend
+    ports:
+      - 1025:1025
+      - 8025:8025
+
+networks:
+  backend:
+  frontend:
+
+volumes:
+  db-data:
+    driver: local
