@@ -107,7 +107,10 @@ const OneRoomPage = () => {
             if (spectate) {
               setSpectate(true);
             } else {
-              Cookies.set('_ws_id', res.data.ws_id, { expires: 1 });
+              Cookies.set('_ws_id', res.data.ws_id, {
+                expires: 1,
+                sameSite: 'Strict'
+              });
               setSpectate(false);
             }
 

@@ -85,7 +85,9 @@ router.post('/refresh', async (req: Request, res: Response) => {
   }
 
   // Get user
-  const user = await userRepository.findOneBy({ id: payload['user_id'] });
+  const user = await userRepository.findOneBy({
+    id: payload['payload']['user_id']
+  });
 
   // Create access token
   const accessToken = await createAccessToken(user);
