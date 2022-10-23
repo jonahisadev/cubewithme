@@ -12,7 +12,7 @@
 
 ## Features
 
-* ⚡**Fast & Easy** - Join a room with one click
+* ⚡ **Fast & Easy** - Join a room with one click
 * 💪 **Stable** - Built to last
 * 📱 **Mobile Support** - Designed with a mobile-first mindset
 * 🏁 **Every WCA Event** - Play every officially supported WCA event type
