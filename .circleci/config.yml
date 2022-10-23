@@ -9,6 +9,9 @@ workflows:
   setup:
     jobs:
       - path-filtering/filter:
+          filters:
+            branches:
+              only: main
           base-revision: main
           config-path: .circleci/deploy.yml
           mapping: |
