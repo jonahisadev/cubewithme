@@ -5,11 +5,22 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Title from '@/components/Title';
 import { useAuth } from '@/components/providers/AuthProvider';
+import Loading from '@/components/Loading';
 
 const UserPage = () => {
   const auth = useAuth();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (!user && !error) {
+      return;
+    }
+
+    setLoading(false);
+  }, [user, error]);
 
   useEffect(() => {
     if (!router.isReady) {
@@ -22,12 +33,22 @@ const UserPage = () => {
         setUser(res.data.user);
       })
       .catch(err => {
-        console.log(err);
+        setError(err.response.data.reason);
       });
   }, [router.isReady]);
 
-  if (!user) {
-    return <div>No user</div>;
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return (
+      <>
+        <Title>Error</Title>
+        <Navbar current="profile" />
+        <p className="text-lg text-center mt-5">{error}</p>
+      </>
+    );
   }
 
   return (

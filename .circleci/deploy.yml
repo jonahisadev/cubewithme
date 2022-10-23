@@ -12,7 +12,7 @@ parameters:
     default: false
   deploy-ws:
     type: boolean
-    default: true
+    default: false
 
 jobs:
   deploy-web:
