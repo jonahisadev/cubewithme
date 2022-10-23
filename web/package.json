@@ -22,8 +22,7 @@
     "jsonwebtoken": "^8.5.1",
     "next": "^12.2.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "vercel": "^28.4.12"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.7",

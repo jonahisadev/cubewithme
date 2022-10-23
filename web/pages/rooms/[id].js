@@ -115,6 +115,7 @@ const OneRoomPage = () => {
             }
 
             // 8. Set up websocket
+            setInitLoading(false);
             setWebsocketOpts({
               id: res.data.ws_id || '',
               url: res.data.ws_url
@@ -122,7 +123,7 @@ const OneRoomPage = () => {
           });
       });
     },
-    [auth]
+    [auth, passModal]
   );
 
   // Page mount; Run the authentication flow for current room
@@ -144,7 +145,6 @@ const OneRoomPage = () => {
         variant: 'error'
       })
     );
-    setInitLoading(false);
 
     return () => {
       ws.current?.close(1000);
