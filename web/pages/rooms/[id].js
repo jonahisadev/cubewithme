@@ -467,6 +467,14 @@ const OneRoomPage = () => {
       sitOut,
       admin
     });
+
+    // Ensure we are the first player
+    if (copy[0].id !== websocketOpts.id) {
+      const idx = copy.findIndex(p => p.id === websocketOpts.id);
+      const player = copy.splice(idx, 1);
+      copy.unshift(...player);
+    }
+
     setPlayers([...copy]);
   };
 
