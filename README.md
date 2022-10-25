@@ -10,6 +10,16 @@
 
 ------
 
+## Support the Project
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/M4M4FX3WA)
+
+Though this is a community project, I still pay for the site to be hosted.
+Because of the real-time communication, extra juice is required to reliably
+run the service. I pay for all of this out of pocket. Because the service will
+always remain free, I rely on donations to keep the service alive. Any donations
+are greatly appreciated!
+
 ## Features
 
 * ⚡ **Fast & Easy** - Join a room with one click
