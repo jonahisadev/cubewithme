@@ -340,11 +340,13 @@ class Room {
       // If player was admin, select new admin
       if (player.admin && allPlayers.length > 0) {
         player.admin = false;
-        const newAdmin = allPlayers[1];
-        newAdmin.admin = true;
-        this.send(newAdmin.id, {
-          type: 'newadmin'
-        });
+        const newAdmin = Array.from(this.clients.values())[0];
+        if (newAdmin) {
+          newAdmin.admin = true;
+          this.send(newAdmin.id, {
+            type: 'newadmin'
+          });
+        }
       }
 
       // Break socket

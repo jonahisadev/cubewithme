@@ -25,6 +25,7 @@ import cuid from 'cuid';
 import Cookies from 'js-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShareFromSquare } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
 
 const OneRoomPage = () => {
   // Auth
@@ -63,6 +64,7 @@ const OneRoomPage = () => {
   });
   const [roomPassword, setRoomPassword] = useState('');
   const [event, setEvent] = useState('333');
+  const [disconnected, setDisconnected] = useState(null);
 
   // Chat
   const [chatMessages, setChatMessages] = useState('');
@@ -359,13 +361,8 @@ const OneRoomPage = () => {
 
     ws.current.onclose = e => {
       if (e.code !== 1000) {
-        toast.addToast({
-          title: 'Disconnected',
-          text: `You've been disconnected from the server: ${
-            e.reason || 'Unknown reason'
-          }`,
-          delay: 5000,
-          variant: 'error'
+        setDisconnected({
+          reason: e.reason || 'Unknown reason'
         });
       }
     };
@@ -906,6 +903,24 @@ const OneRoomPage = () => {
           />
         </div>
       </div>
+
+      {/* Disconnected screen */}
+      {disconnected && (
+        <div className="absolute top-0 left-0 w-full h-screen backdrop-blur-md bg-white/30 dark:bg-black/30 z-10">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center mx-3 md:mx-0">
+            <h1 className="text-5xl font-bold mb-1">Disconnected</h1>
+            <p className="text-2xl mb-5">{disconnected.reason}</p>
+            <Link
+              href="/rooms"
+              passHref
+            >
+              <a className="text-lg underline text-blue-500">
+                Go back to Rooms
+              </a>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Share Modal */}
       <Modal
