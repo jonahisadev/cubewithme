@@ -318,7 +318,8 @@ class Room {
   }
 
   private handleClose(ws: WebSocket): void {
-    const player = Array.from(this.clients.values()).find(p => p.socket == ws);
+    const allPlayers = Array.from(this.clients.values());
+    const player = allPlayers.find(p => p.socket == ws);
     if (player) {
       // Delete player from list
       this.clients.delete(player.id);
@@ -334,6 +335,16 @@ class Room {
         if (remIdx >= 0) {
           this.timeBuffer.remaining.splice(remIdx, 1);
         }
+      }
+
+      // If player was admin, select new admin
+      if (player.admin && allPlayers.length > 0) {
+        player.admin = false;
+        const newAdmin = allPlayers[1];
+        newAdmin.admin = true;
+        this.send(newAdmin.id, {
+          type: 'newadmin'
+        });
       }
 
       // Break socket

@@ -341,6 +341,18 @@ const OneRoomPage = () => {
 
         case 'event': {
           setEvent(message.event);
+          break;
+        }
+
+        // New Admin
+        case 'newadmin': {
+          me().admin = true;
+          toast.addToast({
+            title: 'Message From Server',
+            text: 'You are the new room admin',
+            delay: 5000
+          });
+          break;
         }
       }
     };

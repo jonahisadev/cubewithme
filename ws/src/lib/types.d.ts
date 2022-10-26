@@ -72,6 +72,10 @@ export interface OutMessageEvent {
   event: ScrambleEvent;
 }
 
+export interface OutMessageNewAdmin {
+  type: 'newadmin';
+}
+
 export type OutMessage =
   | OutMessageHandshake
   | OutMessagePlayerJoin
@@ -84,7 +88,8 @@ export type OutMessage =
   | OutMessageScramble
   | OutMessageSpectate
   | OutMessageChat
-  | OutMessageEvent;
+  | OutMessageEvent
+  | OutMessageNewAdmin;
 
 export interface InMessageHandshake {
   type: 'handshake';
