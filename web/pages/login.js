@@ -7,6 +7,7 @@ import { useToast } from '@/providers/ToastProvider';
 import { useAuth } from '@/providers/AuthProvider';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const Login = () => {
   const [values, handleChange] = useForm({
@@ -30,6 +31,7 @@ const Login = () => {
             delay: 3000
           });
           auth.setToken(data.accessToken);
+          Cookies.remove('_ws_id');
           router.push('/rooms');
         }
       })
