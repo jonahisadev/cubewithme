@@ -65,7 +65,7 @@ const Navbar = ({ current }) => {
         </Button>
       </div>
       <div
-        className="inline-flex hidden w-full md:block md:w-auto"
+        className="hidden w-full md:block md:w-auto"
         ref={menu}
       >
         <ul className="list-none w-full md:flex">
