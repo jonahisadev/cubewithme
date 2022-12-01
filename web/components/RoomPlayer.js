@@ -15,14 +15,15 @@ const RoomPlayer = ({ me, name, times, ready, sitOut, showAdmin, onKick }) => {
   const popover = usePopover(false);
 
   const average = total => {
-    if (times.length < total) return 'DNF';
+    const onlyTimes = times.filter(x => typeof x.time !== 'string');
+    if (onlyTimes.length < total) return 'DNF';
 
     let timeList = [];
 
     // Compile list
     for (let i = 0; i < total; i++) {
       // Time
-      const time = times[i];
+      const time = onlyTimes[i];
 
       // Skip sit-outs
       if (typeof time.time === 'string') continue;
