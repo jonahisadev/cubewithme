@@ -385,12 +385,14 @@ const OneRoomPage = () => {
     if (gameState.editTime) {
       const input = editTimeInput.current;
 
-      setEditTimeValue(fmtTime(gameState.time));
+      setEditTimeValue(gameState.time === 0 ? '' : fmtTime(gameState.time));
       input.focus();
 
       const finish = (discard = false) => {
         setGameState(gameState => ({
-          time: discard ? gameState.time : parseFloat(input.value) * 1000,
+          time: discard
+            ? gameState.time
+            : parseFloat(input.value || '0') * 1000,
           editTime: false
         }));
         input.removeEventListener('blur', finish);
