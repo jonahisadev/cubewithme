@@ -389,6 +389,15 @@ const OneRoomPage = () => {
       input.focus();
 
       const finish = (discard = false) => {
+        if (!input.value.includes('.')) {
+          let addDot = input.value.padStart(5, '0');
+          addDot =
+            addDot.slice(0, addDot.length - 3) +
+            '.' +
+            addDot.slice(addDot.length - 3);
+          input.value = addDot;
+        }
+
         setGameState(gameState => ({
           time: discard
             ? gameState.time
